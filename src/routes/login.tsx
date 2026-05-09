@@ -13,10 +13,12 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { role: initial } = Route.useSearch();
   const nav = useNavigate();
+  const [mounted, setMounted] = useState(false);
   const [role, setRole] = useState<"admin" | "client">(initial);
   const [email, setEmail] = useState(initial === "admin" ? "admin@suraksha.in" : "ananya@demo.in");
   const [password, setPassword] = useState(initial === "admin" ? "admin123" : "client123");
   const [err, setErr] = useState("");
+  useEffect(() => setMounted(true), []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
