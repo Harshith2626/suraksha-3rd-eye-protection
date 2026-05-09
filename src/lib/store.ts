@@ -201,6 +201,7 @@ function applyRemote(remote: State) {
 
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 let pushing = false;
+let lastSeenUpdatedAt = "";
 
 async function pushToCloud() {
   if (typeof window === "undefined") return;
@@ -209,13 +210,37 @@ async function pushToCloud() {
     pushing = true;
     // Strip per-tab session before sharing globally.
     const { session: _omit, ...shared } = state;
+    const updatedAt = new Date().toISOString();
+    lastSeenUpdatedAt = updatedAt;
     await supabase
       .from("app_state")
-      .upsert({ id: ROW_ID, data: shared as never, origin: ORIGIN, updated_at: new Date().toISOString() });
+      .upsert({ id: ROW_ID, data: shared as never, origin: ORIGIN, updated_at: updatedAt });
   } catch (e) {
     console.warn("[store] cloud push failed", e);
   } finally {
     pushing = false;
+  }
+}
+
+// Polling fallback in case realtime websocket events don't arrive.
+async function pollCloud() {
+  if (typeof window === "undefined") return;
+  if (pushing) return;
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("app_state")
+      .select("data, origin, updated_at")
+      .eq("id", ROW_ID)
+      .maybeSingle();
+    if (error || !data) return;
+    const row = data as { data: State; origin: string | null; updated_at: string };
+    if (!row.updated_at || row.updated_at === lastSeenUpdatedAt) return;
+    lastSeenUpdatedAt = row.updated_at;
+    if (row.origin === ORIGIN) return; // our own write
+    applyRemote(row.data as State);
+  } catch {
+    // ignore polling errors
   }
 }
 
@@ -244,11 +269,12 @@ async function bootstrapCloud() {
     const { supabase } = await import("@/integrations/supabase/client");
     const { data, error } = await supabase
       .from("app_state")
-      .select("data")
+      .select("data, updated_at")
       .eq("id", ROW_ID)
       .maybeSingle();
     if (error) throw error;
     if (data?.data) {
+      lastSeenUpdatedAt = (data as { updated_at?: string }).updated_at ?? "";
       applyRemote(data.data as unknown as State);
     } else {
       // First boot: seed cloud with our local state.
@@ -260,14 +286,19 @@ async function bootstrapCloud() {
         "postgres_changes",
         { event: "*", schema: "public", table: "app_state", filter: `id=eq.${ROW_ID}` },
         (payload) => {
-          const row = (payload.new ?? payload.old) as { data?: State; origin?: string } | undefined;
+          const row = (payload.new ?? payload.old) as { data?: State; origin?: string; updated_at?: string } | undefined;
           if (!row?.data) return;
+          if (row.updated_at) lastSeenUpdatedAt = row.updated_at;
           if (row.origin === ORIGIN) return; // ignore self-echo
           if (pushing) return;
           applyRemote(row.data as State);
         },
       )
       .subscribe();
+    // Polling fallback every 1.5s in case realtime events are dropped.
+    setInterval(pollCloud, 1500);
+    // Also poll when the tab regains focus for snappier sync.
+    window.addEventListener("focus", pollCloud);
   } catch (e) {
     console.warn("[store] cloud bootstrap failed", e);
   }
