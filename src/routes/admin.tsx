@@ -10,6 +10,8 @@ import { ClientOnly } from "@/components/ClientOnly";
 export const Route = createFileRoute("/admin")({ component: AdminDash });
 
 function AdminDash() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const nav = useNavigate();
   const session = useStore((s) => s.session);
   const clients = useStore((s) => s.clients);
