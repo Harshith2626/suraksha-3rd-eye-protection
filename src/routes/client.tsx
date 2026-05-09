@@ -31,7 +31,7 @@ function ClientDash() {
     return () => clearInterval(t);
   }, []);
 
-  if (!client) return null;
+  if (!mounted || !client) return null;
   const safety = computeSafety(client);
 
   const sos = () => {
