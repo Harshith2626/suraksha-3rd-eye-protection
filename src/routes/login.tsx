@@ -27,6 +27,7 @@ function LoginPage() {
     nav({ to: role === "admin" ? "/admin" : "/client" });
   };
 
+  if (!mounted) return <div className="min-h-screen" />;
   return (
     <div className="min-h-screen px-6 py-10">
       <Link to="/" className="inline-flex items-center gap-2">
