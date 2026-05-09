@@ -201,6 +201,7 @@ function applyRemote(remote: State) {
 
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 let pushing = false;
+let lastSeenUpdatedAt = "";
 
 async function pushToCloud() {
   if (typeof window === "undefined") return;
@@ -209,13 +210,37 @@ async function pushToCloud() {
     pushing = true;
     // Strip per-tab session before sharing globally.
     const { session: _omit, ...shared } = state;
+    const updatedAt = new Date().toISOString();
+    lastSeenUpdatedAt = updatedAt;
     await supabase
       .from("app_state")
-      .upsert({ id: ROW_ID, data: shared as never, origin: ORIGIN, updated_at: new Date().toISOString() });
+      .upsert({ id: ROW_ID, data: shared as never, origin: ORIGIN, updated_at: updatedAt });
   } catch (e) {
     console.warn("[store] cloud push failed", e);
   } finally {
     pushing = false;
+  }
+}
+
+// Polling fallback in case realtime websocket events don't arrive.
+async function pollCloud() {
+  if (typeof window === "undefined") return;
+  if (pushing) return;
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("app_state")
+      .select("data, origin, updated_at")
+      .eq("id", ROW_ID)
+      .maybeSingle();
+    if (error || !data) return;
+    const row = data as { data: State; origin: string | null; updated_at: string };
+    if (!row.updated_at || row.updated_at === lastSeenUpdatedAt) return;
+    lastSeenUpdatedAt = row.updated_at;
+    if (row.origin === ORIGIN) return; // our own write
+    applyRemote(row.data as State);
+  } catch {
+    // ignore polling errors
   }
 }
 
