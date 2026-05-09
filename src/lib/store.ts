@@ -154,7 +154,24 @@ const seedClients = (): Client[] => [
 export const DANGER_ZONES = [
   { name: "Reported unsafe alley", lat: 17.438, lng: 78.505, radius: 600 },
   { name: "Low-light industrial area", lat: 17.46, lng: 78.41, radius: 500 },
+  { name: "Abandoned construction site", lat: 17.402, lng: 78.478, radius: 450 },
+  { name: "High-crime market lane", lat: 17.385, lng: 78.486, radius: 550 },
+  { name: "Isolated highway stretch", lat: 17.471, lng: 78.552, radius: 700 },
+  { name: "Unlit park area", lat: 17.428, lng: 78.452, radius: 400 },
+  { name: "Reported harassment hotspot", lat: 17.395, lng: 78.435, radius: 500 },
+  { name: "Late-night liquor zone", lat: 17.448, lng: 78.498, radius: 450 },
 ];
+
+// Suraksha emergency hotline — same number for all users, code identifies caller.
+export const SURAKSHA_HOTLINE = "+91 800-SURAKSHA";
+
+// Deterministic 6-digit emergency code for a client (derived from id+phone).
+export function emergencyCodeFor(clientId: string, phone: string): string {
+  let h = 0;
+  const s = clientId + "|" + phone;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return String(100000 + (h % 900000));
+}
 
 const initialState = (): State => ({
   admins: [DEFAULT_ADMIN],
