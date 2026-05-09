@@ -76,21 +76,42 @@ function RegisterPage() {
             <p className="mb-2 text-xs text-muted-foreground">Places you frequently visit (home, college, office).</p>
             <div className="space-y-2">
               {zones.map((z, i) => (
-                <div key={i} className="grid grid-cols-[1fr_110px_auto] items-start gap-2">
-                  <div>
-                    <PlaceSearch
-                      value={z.name}
-                      onSelect={({ name, lat, lng }) => upd(setZones, zones, i, { name, lat, lng } as Partial<SafeZone>)}
-                      placeholder="Search city or place…"
-                    />
-                    {(z.lat || z.lng) ? (
-                      <p className="mt-1 pl-1 text-[10px] text-muted-foreground">
-                        {z.lat.toFixed(4)}, {z.lng.toFixed(4)}
-                      </p>
-                    ) : null}
+                <div key={i} className="rounded-lg border border-border/60 p-3">
+                  <div className="grid grid-cols-[1fr_110px_auto] items-start gap-2">
+                    <div>
+                      <PlaceSearch
+                        value={z.name}
+                        onSelect={({ name, lat, lng }) => upd(setZones, zones, i, { name, lat, lng } as Partial<SafeZone>)}
+                        placeholder="Search city or place…"
+                      />
+                    </div>
+                    <input placeholder="Radius m" type="number" value={z.radius} onChange={(e) => upd(setZones, zones, i, { radius: +e.target.value })} className={inp} />
+                    <button type="button" onClick={() => setZones(zones.filter((_, j) => j !== i))} className="rounded-md border border-border px-2 py-2 text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
                   </div>
-                  <input placeholder="Radius m" type="number" value={z.radius} onChange={(e) => upd(setZones, zones, i, { radius: +e.target.value })} className={inp} />
-                  <button type="button" onClick={() => setZones(zones.filter((_, j) => j !== i))} className="rounded-md border border-border px-2 py-2 text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <label className="block">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Latitude</span>
+                      <input
+                        type="number"
+                        step="any"
+                        value={Number.isFinite(z.lat) ? z.lat : ""}
+                        onChange={(e) => upd(setZones, zones, i, { lat: parseFloat(e.target.value) })}
+                        placeholder="e.g. 17.4156"
+                        className={`mt-1 w-full ${inp}`}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Longitude</span>
+                      <input
+                        type="number"
+                        step="any"
+                        value={Number.isFinite(z.lng) ? z.lng : ""}
+                        onChange={(e) => upd(setZones, zones, i, { lng: parseFloat(e.target.value) })}
+                        placeholder="e.g. 78.4347"
+                        className={`mt-1 w-full ${inp}`}
+                      />
+                    </label>
+                  </div>
                 </div>
               ))}
             </div>
