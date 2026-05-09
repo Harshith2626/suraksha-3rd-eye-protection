@@ -50,12 +50,28 @@ function TrackClient() {
   const escalatePolice = () => {
     if (incident) store.addEscalation(incident.id, { level: "police_ngo", note: "Police & nearest NGO alerted with live location" });
   };
+  const sendHomeAndSafe = () => {
+    const home = client.safeZones[0];
+    if (home) {
+      store.updateClient(client.id, {
+        lat: home.lat,
+        lng: home.lng,
+        safetyScore: 100,
+        status: "safe",
+        inSafeZone: true,
+        responsive: true,
+      });
+    } else {
+      store.updateClient(client.id, { safetyScore: 100, status: "safe", responsive: true });
+    }
+  };
   const dispatchRescue = () => {
-    if (incident) store.addEscalation(incident.id, { level: "rescue_dispatched", note: "Rescue team dispatched to live location" });
+    if (incident) store.addEscalation(incident.id, { level: "rescue_dispatched", note: "Rescue team dispatched — client escorted to home safe zone" });
+    sendHomeAndSafe();
   };
   const resolve = () => {
     if (incident) store.addEscalation(incident.id, { level: "resolved", note: "Incident resolved by admin" });
-    store.updateClient(client.id, { responsive: true });
+    sendHomeAndSafe();
   };
 
   return (
