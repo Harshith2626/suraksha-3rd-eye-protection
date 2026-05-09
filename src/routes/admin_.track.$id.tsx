@@ -18,6 +18,8 @@ const ALERT_TEMPLATES: { kind: AlertKind; label: string; message: string }[] = [
 ];
 
 function TrackClient() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { id } = Route.useParams();
   const nav = useNavigate();
   const session = useStore((s) => s.session);
@@ -31,6 +33,7 @@ function TrackClient() {
     if (!session || session.role !== "admin") nav({ to: "/login", search: { role: "admin" } });
   }, [session, nav]);
 
+  if (!mounted) return null;
   if (!client) return <div className="p-6">Client not found.</div>;
   const safety = computeSafety(client);
 

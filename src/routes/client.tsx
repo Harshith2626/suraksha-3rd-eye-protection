@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Shield, LogOut, PhoneCall, Bell, MapPin, Sparkles, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { store, useStore } from "@/lib/store";
 import { computeSafety, recomputeAll } from "@/lib/safety";
@@ -11,6 +11,8 @@ import { DemoControls } from "@/components/DemoControls";
 export const Route = createFileRoute("/client")({ component: ClientDash });
 
 function ClientDash() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const nav = useNavigate();
   const session = useStore((s) => s.session);
   const client = useStore((s) => {
@@ -29,7 +31,7 @@ function ClientDash() {
     return () => clearInterval(t);
   }, []);
 
-  if (!client) return null;
+  if (!mounted || !client) return null;
   const safety = computeSafety(client);
 
   const sos = () => {

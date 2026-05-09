@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Shield, LogOut, Users, AlertTriangle, Bell, Activity } from "lucide-react";
 import { store, useStore } from "@/lib/store";
 import { recomputeAll } from "@/lib/safety";
@@ -10,6 +10,8 @@ import { ClientOnly } from "@/components/ClientOnly";
 export const Route = createFileRoute("/admin")({ component: AdminDash });
 
 function AdminDash() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const nav = useNavigate();
   const session = useStore((s) => s.session);
   const clients = useStore((s) => s.clients);
@@ -33,6 +35,7 @@ function AdminDash() {
   const activeIncidents = incidents.filter((i) => i.active);
   const pendingAlerts = alerts.filter((a) => a.status === "pending");
 
+  if (!mounted) return null;
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Shield } from "lucide-react";
 import { store } from "@/lib/store";
 
@@ -13,10 +13,12 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { role: initial } = Route.useSearch();
   const nav = useNavigate();
+  const [mounted, setMounted] = useState(false);
   const [role, setRole] = useState<"admin" | "client">(initial);
   const [email, setEmail] = useState(initial === "admin" ? "admin@suraksha.in" : "ananya@demo.in");
   const [password, setPassword] = useState(initial === "admin" ? "admin123" : "client123");
   const [err, setErr] = useState("");
+  useEffect(() => setMounted(true), []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +27,7 @@ function LoginPage() {
     nav({ to: role === "admin" ? "/admin" : "/client" });
   };
 
+  if (!mounted) return <div className="min-h-screen" />;
   return (
     <div className="min-h-screen px-6 py-10">
       <Link to="/" className="inline-flex items-center gap-2">

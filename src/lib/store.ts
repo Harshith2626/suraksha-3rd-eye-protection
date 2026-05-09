@@ -183,6 +183,8 @@ function load(): State {
 }
 
 function persist() {
+  // bump state reference so selectors / memos see a change
+  state = { ...state };
   if (typeof window !== "undefined") {
     localStorage.setItem(KEY, JSON.stringify(state));
   }
@@ -287,12 +289,30 @@ export const store = {
   },
 };
 
-// React hook
-import { useSyncExternalStore } from "react";
+// React hook — use selector with equality check to avoid infinite render loops
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
+function shallowEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (!Object.is(a[i], b[i])) return false;
+    return true;
+  }
+  if (a && b && typeof a === "object" && typeof b === "object") {
+    const ka = Object.keys(a as object);
+    const kb = Object.keys(b as object);
+    if (ka.length !== kb.length) return false;
+    for (const k of ka) if (!Object.is((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k])) return false;
+    return true;
+  }
+  return false;
+}
 export function useStore<T>(selector: (s: State) => T): T {
-  return useSyncExternalStore(
+  return useSyncExternalStoreWithSelector(
     (cb) => store.subscribe(cb),
-    () => selector(store.get()),
-    () => selector(store.get()),
+    () => state,
+    () => state,
+    selector,
+    shallowEqual,
   );
 }
