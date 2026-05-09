@@ -18,6 +18,8 @@ const ALERT_TEMPLATES: { kind: AlertKind; label: string; message: string }[] = [
 ];
 
 function TrackClient() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { id } = Route.useParams();
   const nav = useNavigate();
   const session = useStore((s) => s.session);
