@@ -14,7 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ClientRouteImport } from './routes/client'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminClientIdRouteImport } from './routes/admin.client.$id'
+import { Route as AdminTrackIdRouteImport } from './routes/admin_.track.$id'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -41,36 +41,36 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminClientIdRoute = AdminClientIdRouteImport.update({
-  id: '/client/$id',
-  path: '/client/$id',
-  getParentRoute: () => AdminRoute,
+const AdminTrackIdRoute = AdminTrackIdRouteImport.update({
+  id: '/admin_/track/$id',
+  path: '/admin/track/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin/client/$id': typeof AdminClientIdRoute
+  '/admin/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin/client/$id': typeof AdminClientIdRoute
+  '/admin/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin/client/$id': typeof AdminClientIdRoute
+  '/admin_/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,9 +80,9 @@ export interface FileRouteTypes {
     | '/client'
     | '/login'
     | '/register'
-    | '/admin/client/$id'
+    | '/admin/track/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/client' | '/login' | '/register' | '/admin/client/$id'
+  to: '/' | '/admin' | '/client' | '/login' | '/register' | '/admin/track/$id'
   id:
     | '__root__'
     | '/'
@@ -90,15 +90,16 @@ export interface FileRouteTypes {
     | '/client'
     | '/login'
     | '/register'
-    | '/admin/client/$id'
+    | '/admin_/track/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
+  AdminRoute: typeof AdminRoute
   ClientRoute: typeof ClientRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  AdminTrackIdRoute: typeof AdminTrackIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,32 +139,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/client/$id': {
-      id: '/admin/client/$id'
-      path: '/client/$id'
-      fullPath: '/admin/client/$id'
-      preLoaderRoute: typeof AdminClientIdRouteImport
-      parentRoute: typeof AdminRoute
+    '/admin_/track/$id': {
+      id: '/admin_/track/$id'
+      path: '/admin/track/$id'
+      fullPath: '/admin/track/$id'
+      preLoaderRoute: typeof AdminTrackIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AdminRouteChildren {
-  AdminClientIdRoute: typeof AdminClientIdRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminClientIdRoute: AdminClientIdRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
+  AdminRoute: AdminRoute,
   ClientRoute: ClientRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  AdminTrackIdRoute: AdminTrackIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

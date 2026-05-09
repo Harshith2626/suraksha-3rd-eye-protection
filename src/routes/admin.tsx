@@ -63,7 +63,7 @@ function AdminDash() {
                 if (!c) return null;
                 const lastStep = inc.steps[inc.steps.length - 1];
                 return (
-                  <Link key={inc.id} to="/admin/client/$id" params={{ id: c.id }} className="flex items-center justify-between rounded-lg border border-border bg-card/60 p-3 hover:border-destructive">
+                  <Link key={inc.id} to="/admin/track/$id" params={{ id: c.id }} className="flex items-center justify-between rounded-lg border border-border bg-card/60 p-3 hover:border-destructive">
                     <div>
                       <p className="font-medium">{c.name}</p>
                       <p className="text-xs text-muted-foreground">Trigger: {inc.trigger} · Stage: {lastStep.level} · {new Date(inc.startedAt).toLocaleTimeString()}</p>
@@ -133,7 +133,7 @@ function AdminDash() {
                     </td>
                     <td className="py-3 pr-4 text-xs text-muted-foreground">{c.phone}</td>
                     <td className="py-3 pr-4 text-xs text-muted-foreground">{c.address}</td>
-                    <td className="py-3"><Link to="/admin/client/$id" params={{ id: c.id }} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">Track</Link></td>
+                    <td className="py-3"><Link to="/admin/track/$id" params={{ id: c.id }} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">Track</Link></td>
                   </tr>
                 ))}
               </tbody>

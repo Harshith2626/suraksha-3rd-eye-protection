@@ -7,7 +7,7 @@ import { SafetyMeter, StatusBadge } from "@/components/SafetyMeter";
 import { LocationMap } from "@/components/LocationMap";
 import { ClientOnly } from "@/components/ClientOnly";
 
-export const Route = createFileRoute("/admin/client/$id")({ component: TrackClient });
+export const Route = createFileRoute("/admin_/track/$id")({ component: TrackClient });
 
 const ALERT_TEMPLATES: { kind: AlertKind; label: string; message: string }[] = [
   { kind: "deviation", label: "Route deviation", message: "⚠️ You've deviated from your usual route. Are you safe?" },
