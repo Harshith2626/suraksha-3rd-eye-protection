@@ -13,7 +13,11 @@ export const Route = createFileRoute("/client")({ component: ClientDash });
 function ClientDash() {
   const nav = useNavigate();
   const session = useStore((s) => s.session);
-  const client = useStore((s) => (s.session?.role === "client" ? s.clients.find((c) => c.id === s.session.id) : undefined));
+  const client = useStore((s) => {
+    if (!s.session || s.session.role !== "client") return undefined;
+    const sid = s.session.id;
+    return s.clients.find((c) => c.id === sid);
+  });
   const alerts = useStore((s) => (client ? s.alerts.filter((a) => a.clientId === client.id) : []));
 
   useEffect(() => {
