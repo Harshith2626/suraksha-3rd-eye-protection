@@ -11,10 +11,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   tanstackStart: {
     server: {
-      allowedHosts:true,
+      allowedHosts: true,
     },
 
     preview:{
-      allowedHosts:true,
+      allowedHosts: true,
   },
-});
+}});
