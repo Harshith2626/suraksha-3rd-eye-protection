@@ -33,6 +33,7 @@ function TrackClient() {
     if (!session || session.role !== "admin") nav({ to: "/login", search: { role: "admin" } });
   }, [session, nav]);
 
+  if (!mounted) return null;
   if (!client) return <div className="p-6">Client not found.</div>;
   const safety = computeSafety(client);
 
