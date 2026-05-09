@@ -41,8 +41,18 @@ function ClientDash() {
   };
 
   const missedCall = () => {
-    store.addAlert({ clientId: client.id, kind: "missed_call", message: `📞 Missed-call SOS from ${client.phone}` });
-    store.startIncident(client.id, "missed_call", "Missed-call SOS received");
+    // Simulates: registered phone dials Suraksha hotline + enters their emergency code.
+    // System verifies caller-id matches a registered number, then triggers a full threat alert
+    // and auto-dispatches the nearest rescue team with live location & client info.
+    store.updateClient(client.id, { responsive: false });
+    store.addAlert({
+      clientId: client.id,
+      kind: "missed_call",
+      message: `📞 Verified call from ${client.phone} using code ${emergencyCodeFor(client.id, client.phone)} — THREAT ALERT`,
+    });
+    const inc = store.activeIncidentFor(client.id) ?? store.startIncident(client.id, "missed_call", `Threat call from registered number ${client.phone}`);
+    store.addEscalation(inc.id, { level: "contacts_notified", note: "Emergency contacts auto-notified with live location" });
+    store.addEscalation(inc.id, { level: "rescue_dispatched", note: `Nearest rescue team dispatched to ${client.lat.toFixed(4)}, ${client.lng.toFixed(4)} with client profile & live location` });
   };
 
   const respond = (id: string, ok: boolean) => {
