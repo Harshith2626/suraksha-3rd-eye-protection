@@ -35,6 +35,7 @@ function AdminDash() {
   const activeIncidents = incidents.filter((i) => i.active);
   const pendingAlerts = alerts.filter((a) => a.status === "pending");
 
+  if (!mounted) return null;
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
