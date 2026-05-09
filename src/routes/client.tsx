@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Shield, LogOut, PhoneCall, Bell, MapPin, Sparkles, AlertTriangle, CheckCircle2, X } from "lucide-react";
-import { store, useStore } from "@/lib/store";
+import { Shield, LogOut, PhoneCall, Bell, MapPin, Sparkles, AlertTriangle, CheckCircle2, X, Copy } from "lucide-react";
+import { store, useStore, SURAKSHA_HOTLINE, emergencyCodeFor } from "@/lib/store";
 import { computeSafety, recomputeAll } from "@/lib/safety";
 import { SafetyMeter, StatusBadge } from "@/components/SafetyMeter";
 import { LocationMap } from "@/components/LocationMap";
