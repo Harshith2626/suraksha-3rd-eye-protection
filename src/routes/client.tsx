@@ -85,13 +85,38 @@ function ClientDash() {
                 <li key={i} className="flex items-center gap-2"><Sparkles className="h-3 w-3 text-primary" />{r}</li>
               ))}
             </ul>
-            <div className="mt-6 grid w-full grid-cols-2 gap-2">
-              <button onClick={sos} className="pulse-ring inline-flex items-center justify-center gap-1.5 rounded-lg bg-destructive px-3 py-3 text-sm font-bold text-destructive-foreground glow-danger">
-                <AlertTriangle className="h-4 w-4" /> SOS
+            <button onClick={sos} className="pulse-ring mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-destructive px-3 py-3 text-sm font-bold text-destructive-foreground glow-danger">
+              <AlertTriangle className="h-4 w-4" /> SOS
+            </button>
+
+            <div className="mt-4 w-full rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-destructive">
+                <PhoneCall className="h-3.5 w-3.5" /> Threat Call Code
+              </div>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                In danger? Call <span className="font-semibold text-foreground">{SURAKSHA_HOTLINE}</span> from your registered number <span className="font-mono text-foreground">{client.phone}</span> and enter your code:
+              </p>
+              <div className="mt-2 flex items-center justify-between gap-2 rounded-md bg-background/60 px-3 py-2">
+                <span className="font-mono text-2xl font-bold tracking-[0.3em] text-destructive">
+                  {emergencyCodeFor(client.id, client.phone)}
+                </span>
+                <button
+                  onClick={() => navigator.clipboard?.writeText(emergencyCodeFor(client.id, client.phone))}
+                  className="inline-flex items-center gap-1 rounded border border-border px-2 py-1 text-[10px] hover:bg-secondary"
+                  title="Copy code"
+                >
+                  <Copy className="h-3 w-3" /> Copy
+                </button>
+              </div>
+              <button
+                onClick={missedCall}
+                className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md bg-destructive/90 px-3 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive"
+              >
+                <PhoneCall className="h-3.5 w-3.5" /> Simulate Verified Threat Call
               </button>
-              <button onClick={missedCall} className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 py-3 text-sm font-medium hover:bg-secondary">
-                <PhoneCall className="h-4 w-4" /> Missed Call
-              </button>
+              <p className="mt-2 text-[10px] text-muted-foreground">
+                On a verified call, rescue teams are auto-dispatched to your live location with your profile.
+              </p>
             </div>
           </div>
 
