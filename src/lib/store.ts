@@ -167,6 +167,13 @@ const initialState = (): State => ({
 let state: State = load();
 const listeners = new Set<() => void>();
 
+// Per-tab origin id so we can ignore realtime echoes of our own writes.
+const ORIGIN =
+  typeof window !== "undefined"
+    ? (window.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2))
+    : "ssr";
+const ROW_ID = "global";
+
 function load(): State {
   if (typeof window === "undefined") return initialState();
   try {
@@ -182,6 +189,42 @@ function load(): State {
   }
 }
 
+// Merge a remote snapshot. Preserve this tab's local session (auth is local).
+function applyRemote(remote: State) {
+  const localSession = state.session;
+  state = { ...remote, session: localSession };
+  if (typeof window !== "undefined") {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+  listeners.forEach((fn) => fn());
+}
+
+let pushTimer: ReturnType<typeof setTimeout> | null = null;
+let pushing = false;
+
+async function pushToCloud() {
+  if (typeof window === "undefined") return;
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    pushing = true;
+    // Strip per-tab session before sharing globally.
+    const { session: _omit, ...shared } = state;
+    await supabase
+      .from("app_state")
+      .upsert({ id: ROW_ID, data: shared as never, origin: ORIGIN, updated_at: new Date().toISOString() });
+  } catch (e) {
+    console.warn("[store] cloud push failed", e);
+  } finally {
+    pushing = false;
+  }
+}
+
+function schedulePush() {
+  if (typeof window === "undefined") return;
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushToCloud, 250);
+}
+
 function persist() {
   // bump state reference so selectors / memos see a change
   state = { ...state };
@@ -189,6 +232,50 @@ function persist() {
     localStorage.setItem(KEY, JSON.stringify(state));
   }
   listeners.forEach((fn) => fn());
+  schedulePush();
+}
+
+// One-time bootstrap: pull cloud state, then subscribe to realtime updates.
+let bootstrapped = false;
+async function bootstrapCloud() {
+  if (bootstrapped || typeof window === "undefined") return;
+  bootstrapped = true;
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("app_state")
+      .select("data")
+      .eq("id", ROW_ID)
+      .maybeSingle();
+    if (error) throw error;
+    if (data?.data) {
+      applyRemote(data.data as unknown as State);
+    } else {
+      // First boot: seed cloud with our local state.
+      await pushToCloud();
+    }
+    supabase
+      .channel("app_state_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "app_state", filter: `id=eq.${ROW_ID}` },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { data?: State; origin?: string } | undefined;
+          if (!row?.data) return;
+          if (row.origin === ORIGIN) return; // ignore self-echo
+          if (pushing) return;
+          applyRemote(row.data as State);
+        },
+      )
+      .subscribe();
+  } catch (e) {
+    console.warn("[store] cloud bootstrap failed", e);
+  }
+}
+
+if (typeof window !== "undefined") {
+  // Defer to next tick so the supabase client lazy-import doesn't block module init.
+  setTimeout(bootstrapCloud, 0);
 }
 
 export const store = {
