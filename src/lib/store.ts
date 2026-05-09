@@ -183,6 +183,8 @@ function load(): State {
 }
 
 function persist() {
+  // bump state reference so selectors / memos see a change
+  state = { ...state };
   if (typeof window !== "undefined") {
     localStorage.setItem(KEY, JSON.stringify(state));
   }
