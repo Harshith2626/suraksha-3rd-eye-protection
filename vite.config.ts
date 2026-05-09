@@ -15,6 +15,8 @@ export default defineConfig({
     },
 
     preview:{
-      allowedHosts: true,
+      allowedHosts:[
+        'suraksha-3rd-eye-protection-7.onrender.com'
+        ]
   },
 }});
