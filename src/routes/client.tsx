@@ -11,6 +11,8 @@ import { DemoControls } from "@/components/DemoControls";
 export const Route = createFileRoute("/client")({ component: ClientDash });
 
 function ClientDash() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const nav = useNavigate();
   const session = useStore((s) => s.session);
   const client = useStore((s) => {
