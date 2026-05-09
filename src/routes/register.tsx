@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shield, Plus, X } from "lucide-react";
 import { store, type Contact, type SafeZone } from "@/lib/store";
+import { PlaceSearch } from "@/components/PlaceSearch";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
