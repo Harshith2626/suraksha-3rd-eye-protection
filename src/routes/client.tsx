@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Shield, LogOut, PhoneCall, Bell, MapPin, Sparkles, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { store, useStore } from "@/lib/store";
 import { computeSafety, recomputeAll } from "@/lib/safety";
