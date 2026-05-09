@@ -72,6 +72,8 @@ export function computeSafety(c: Client): { score: number; status: Client["statu
 export function recomputeAll() {
   for (const c of store.get().clients) {
     const { score, status } = computeSafety(c);
-    store.updateClient(c.id, { safetyScore: score, status, inSafeZone: inAnySafeZone(c) });
+    const inSafe = inAnySafeZone(c);
+    if (c.safetyScore === score && c.status === status && c.inSafeZone === inSafe) continue;
+    store.updateClient(c.id, { safetyScore: score, status, inSafeZone: inSafe });
   }
 }
