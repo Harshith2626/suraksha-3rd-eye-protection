@@ -163,7 +163,7 @@ export const DANGER_ZONES = [
 ];
 
 // Suraksha emergency hotline — same number for all users, code identifies caller.
-export const SURAKSHA_HOTLINE = "+91 800-SURAKSHA";
+export const SURAKSHA_HOTLINE = "+91 80000-78725742";
 
 // Deterministic 6-digit emergency code for a client (derived from id+phone).
 export function emergencyCodeFor(clientId: string, phone: string): string {
