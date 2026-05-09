@@ -76,12 +76,21 @@ function RegisterPage() {
             <p className="mb-2 text-xs text-muted-foreground">Places you frequently visit (home, college, office).</p>
             <div className="space-y-2">
               {zones.map((z, i) => (
-                <div key={i} className="grid grid-cols-[1fr_90px_90px_90px_auto] gap-2">
-                  <input placeholder="Place name" value={z.name} onChange={(e) => upd(setZones, zones, i, { name: e.target.value })} className={inp} />
-                  <input placeholder="Lat" type="number" step="0.0001" value={z.lat} onChange={(e) => upd(setZones, zones, i, { lat: +e.target.value })} className={inp} />
-                  <input placeholder="Lng" type="number" step="0.0001" value={z.lng} onChange={(e) => upd(setZones, zones, i, { lng: +e.target.value })} className={inp} />
+                <div key={i} className="grid grid-cols-[1fr_110px_auto] items-start gap-2">
+                  <div>
+                    <PlaceSearch
+                      value={z.name}
+                      onSelect={({ name, lat, lng }) => upd(setZones, zones, i, { name, lat, lng } as Partial<SafeZone>)}
+                      placeholder="Search city or place…"
+                    />
+                    {(z.lat || z.lng) ? (
+                      <p className="mt-1 pl-1 text-[10px] text-muted-foreground">
+                        {z.lat.toFixed(4)}, {z.lng.toFixed(4)}
+                      </p>
+                    ) : null}
+                  </div>
                   <input placeholder="Radius m" type="number" value={z.radius} onChange={(e) => upd(setZones, zones, i, { radius: +e.target.value })} className={inp} />
-                  <button type="button" onClick={() => setZones(zones.filter((_, j) => j !== i))} className="rounded-md border border-border px-2 text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => setZones(zones.filter((_, j) => j !== i))} className="rounded-md border border-border px-2 py-2 text-muted-foreground hover:text-destructive"><X className="h-4 w-4" /></button>
                 </div>
               ))}
             </div>
