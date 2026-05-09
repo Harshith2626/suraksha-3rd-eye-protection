@@ -14,7 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ClientRouteImport } from './routes/client'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminClientIdRouteImport } from './routes/admin_.client.$id'
+import { Route as AdminTrackIdRouteImport } from './routes/admin_.track.$id'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -41,9 +41,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminClientIdRoute = AdminClientIdRouteImport.update({
-  id: '/admin_/client/$id',
-  path: '/admin/client/$id',
+const AdminTrackIdRoute = AdminTrackIdRouteImport.update({
+  id: '/admin_/track/$id',
+  path: '/admin/track/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -53,7 +53,7 @@ export interface FileRoutesByFullPath {
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin/client/$id': typeof AdminClientIdRoute
+  '/admin/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +61,7 @@ export interface FileRoutesByTo {
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin/client/$id': typeof AdminClientIdRoute
+  '/admin/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +70,7 @@ export interface FileRoutesById {
   '/client': typeof ClientRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/admin_/client/$id': typeof AdminClientIdRoute
+  '/admin_/track/$id': typeof AdminTrackIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,9 +80,9 @@ export interface FileRouteTypes {
     | '/client'
     | '/login'
     | '/register'
-    | '/admin/client/$id'
+    | '/admin/track/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/client' | '/login' | '/register' | '/admin/client/$id'
+  to: '/' | '/admin' | '/client' | '/login' | '/register' | '/admin/track/$id'
   id:
     | '__root__'
     | '/'
@@ -90,7 +90,7 @@ export interface FileRouteTypes {
     | '/client'
     | '/login'
     | '/register'
-    | '/admin_/client/$id'
+    | '/admin_/track/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -99,7 +99,7 @@ export interface RootRouteChildren {
   ClientRoute: typeof ClientRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
-  AdminClientIdRoute: typeof AdminClientIdRoute
+  AdminTrackIdRoute: typeof AdminTrackIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -139,11 +139,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin_/client/$id': {
-      id: '/admin_/client/$id'
-      path: '/admin/client/$id'
-      fullPath: '/admin/client/$id'
-      preLoaderRoute: typeof AdminClientIdRouteImport
+    '/admin_/track/$id': {
+      id: '/admin_/track/$id'
+      path: '/admin/track/$id'
+      fullPath: '/admin/track/$id'
+      preLoaderRoute: typeof AdminTrackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -155,8 +155,18 @@ const rootRouteChildren: RootRouteChildren = {
   ClientRoute: ClientRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
-  AdminClientIdRoute: AdminClientIdRoute,
+  AdminTrackIdRoute: AdminTrackIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
